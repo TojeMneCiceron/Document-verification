@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="vibe_check" GeneratedClassName="Config">
+  <Profiles />
+  <Settings>
+    <Setting Name="Font" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Times New Roman</Value>
+    </Setting>
+    <Setting Name="FontSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="LONG_TIRE_CODE" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">61485</Value>
+    </Setting>
+    <Setting Name="FIRST_LINE" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">35.45</Value>
+    </Setting>
+    <Setting Name="TOP_BOTTOM" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">56.7</Value>
+    </Setting>
+    <Setting Name="LEFT" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">85.05</Value>
+    </Setting>
+    <Setting Name="RIGHT" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">42.5</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
