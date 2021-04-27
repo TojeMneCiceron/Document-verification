@@ -50,7 +50,7 @@ namespace vibe_check
             if (openFile.ShowDialog() != DialogResult.OK)
                 return;
 
-            if (!Regularochki.CheckFileName(openFile.SafeFileName))
+            if (!VerifRegex.CheckFileName(openFile.SafeFileName))
             {
                 MessageBox.Show($"Имя файла \"{openFile.SafeFileName}\" не соотвествует требованиям по именованию файлов.\nПереименуйте файл в следующем формате:{fileNameFormat}или выберите другой файл", "Неверное имя файла");
                 return;
@@ -171,7 +171,7 @@ namespace vibe_check
                     continue;
                 }
 
-                if (!Regularochki.CheckFileName(temp))
+                if (!VerifRegex.CheckFileName(temp))
                 {
                     MessageBox.Show($"Имя файла \"{temp}\" не соотвествует требованиям по именованию файлов.\nФайл проверке не подлежит", "Неверное имя файла");
                     continue;
@@ -244,7 +244,7 @@ namespace vibe_check
 
         private void bChooseParts_Click(object sender, EventArgs e)
         {
-            var rp = new GOSTRequired();
+            var rp = new StructureWindow();
             rp.ShowDialog();
 
             Structure = rp.Structure;

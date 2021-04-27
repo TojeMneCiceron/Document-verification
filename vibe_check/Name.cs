@@ -24,7 +24,7 @@ namespace vibe_check
 
         private void bSave_Click(object sender, EventArgs e)
         {
-            partName = Regularochki.DeleteExtraSpaces(textBox1.Text);
+            partName = VerifRegex.DeleteExtraSpaces(textBox1.Text);
             DialogResult = DialogResult.OK;
             Close();
         }

@@ -166,7 +166,7 @@ namespace vibe_check
                 style.Font.AllCaps == 1
                 || style.Font.Bold == 0
                 || style.ParagraphFormat.Alignment != WdParagraphAlignment.wdAlignParagraphLeft
-                || !Regularochki.PartList(listMarker)
+                || !VerifRegex.PartList(listMarker)
                 || style.ParagraphFormat.FirstLineIndent - FIRST_LINE > 1;
         }
 
@@ -176,7 +176,7 @@ namespace vibe_check
                 style.Font.AllCaps == 1
                 || style.Font.Bold == 0
                 || style.ParagraphFormat.Alignment != WdParagraphAlignment.wdAlignParagraphLeft
-                || !Regularochki.SubPartList(listMarker)
+                || !VerifRegex.SubPartList(listMarker)
                 || style.ParagraphFormat.FirstLineIndent - FIRST_LINE > 1;
         }
 
@@ -215,7 +215,7 @@ namespace vibe_check
                 style.Font.AllCaps == 1
                 || style.Font.Bold == 1
                 || style.ParagraphFormat.Alignment != WdParagraphAlignment.wdAlignParagraphJustify
-                || !Regularochki.LitrList(listMarker)
+                || !VerifRegex.LitrList(listMarker)
                 || style.ParagraphFormat.FirstLineIndent - FIRST_LINE > 1;
         }
 
@@ -244,7 +244,7 @@ namespace vibe_check
 
             Style style = paragraph.get_Style();
             string listMarker = paragraph.Range.ListFormat.ListString;
-            string text = Regularochki.DeleteExtraSpaces(paragraph.Range.Text);
+            string text = VerifRegex.DeleteExtraSpaces(paragraph.Range.Text);
 
             switch (listStatus)
             {
@@ -261,7 +261,7 @@ namespace vibe_check
                     if (listMarker == "")
                         comm = "Ожидался маркер списка";
                     else
-                    if (listMarker[0] != LONG_TIRE_CODE || !Regularochki.ListMarker(listMarker))
+                    if (listMarker[0] != LONG_TIRE_CODE || !VerifRegex.ListMarker(listMarker))
                         comm = "Неверный маркер списка";
 
                     if (text[text.Length - 1] == '.')
@@ -286,7 +286,7 @@ namespace vibe_check
             switch (imCheck)
             {
                 case ImageStatus.None:
-                    if (Regularochki.FindImageReference(paragraph.Range.Text) && !Regularochki.IsImageCaption(paragraph.Range.Text, 0))
+                    if (VerifRegex.FindImageReference(paragraph.Range.Text) && !VerifRegex.IsImageCaption(paragraph.Range.Text, 0))
                         imCheck = ImageStatus.Img;
 
                     if (inShapes.Count != 0)
@@ -321,7 +321,7 @@ namespace vibe_check
                     //    break;
                     //}
 
-                    if (Regularochki.IsImageCaption(paragraph.Range.Text, 0))
+                    if (VerifRegex.IsImageCaption(paragraph.Range.Text, 0))
                     {
                         if (ImageCaptionCheck(paragraph.get_Style()))
                             comm = "Неверно оформлено наименование рисунка";
@@ -344,7 +344,7 @@ namespace vibe_check
             switch (tabCheck)
             {
                 case TableStatus.None:
-                    if (Regularochki.FindTableReference(paragraph.Range.Text) && !Regularochki.IsTableCaption(paragraph.Range.Text, 0))
+                    if (VerifRegex.FindTableReference(paragraph.Range.Text) && !VerifRegex.IsTableCaption(paragraph.Range.Text, 0))
                         tabCheck = TableStatus.Cap;
 
                     //if (paragraph.Range.Tables.Count != 0)
@@ -355,7 +355,7 @@ namespace vibe_check
                     break;
 
                 case TableStatus.Cap:
-                    if (Regularochki.IsTableCaption(paragraph.Range.Text, 0))
+                    if (VerifRegex.IsTableCaption(paragraph.Range.Text, 0))
                     {
                         if (TableCaptionCheck(paragraph.get_Style()))
                             comm = "Неверно оформлено наименование таблицы";
@@ -451,7 +451,7 @@ namespace vibe_check
                 return false;
             }
                         
-            string fio = Regularochki.FIO(fileName);
+            string fio = VerifRegex.FIO(fileName);
 
             string comment = "";
 
@@ -464,12 +464,17 @@ namespace vibe_check
                 if (comment != "")
                     paragraph.Range.Comments.Add(paragraph.Range, comment);
 
-                if (Regularochki.PageBreak(paragraph.Range.Text))
+                if (VerifRegex.PageBreak(paragraph.Range.Text))
                     continue;
                
                 if (PageNumber(paragraph.Range) < 2)
                     if (paragraph.Range.Text.Contains(fio))
                         fioFound = true;
+
+                comment = ListCheck(paragraph);
+
+                if (comment != "")
+                    paragraph.Range.Comments.Add(paragraph.Range, comment);
 
                 comment = ImageCheck(paragraph);
 
@@ -489,13 +494,13 @@ namespace vibe_check
                     if (paragraph.Range.Text.ToLower().Contains("приложение"))
                         ;
 
-                    if (Regularochki.EmptyString(paragraph.Range.Text))
+                    if (VerifRegex.EmptyString(paragraph.Range.Text))
                     {
                         paragraph.Range.Comments.Add(paragraph.Range, "Пустая строка");
                         continue;
                     }
 
-                    if (!Regularochki.GetSourceRefNums(paragraph.Range.Text, ref refs))
+                    if (!VerifRegex.GetSourceRefNums(paragraph.Range.Text, ref refs))
                         paragraph.Range.Comments.Add(paragraph.Range, "Неверная последовательность ссылок на использованные источники");
 
                     Style style = paragraph.get_Style();
@@ -508,7 +513,7 @@ namespace vibe_check
                     //    paragraph.Range.Comments.Add(paragraph.Range, comment);
 
                                         
-                    string header = Regularochki.DeleteExtraSpaces(paragraph.Range.Text.ToLower());
+                    string header = VerifRegex.DeleteExtraSpaces(paragraph.Range.Text.ToLower());
 
                     if (Structure.ContainsKey(header))
                     {
@@ -519,7 +524,7 @@ namespace vibe_check
                         if (RequiredParts.Contains(header))
                         {
                             if (RequiredPartHeaderCheck(style))
-                                paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлен заголовок обязательного структурного элемента");
+                                paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлен заголовок структурного элемента");
 
                             if (Attachments.ContainsKey(header))
                             {
@@ -541,18 +546,18 @@ namespace vibe_check
                         }
                     }
                     else
-                    if (Regularochki.IsImageCaption(paragraph.Range.Text, 0))
-                    {
-                        if (ImageCaptionCheck(style))
-                            paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлена подпись рисунка");
-                    }
-                    else
-                    if (Regularochki.IsTableCaption(paragraph.Range.Text, 0))
-                    {
-                        if (TableCaptionCheck(style))
-                            paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлена подпись таблицы");
-                    }
-                    else
+                    //if (Regularochki.IsImageCaption(paragraph.Range.Text, 0))
+                    //{
+                    //    if (ImageCaptionCheck(style))
+                    //        paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлена подпись рисунка");
+                    //}
+                    //else
+                    //if (Regularochki.IsTableCaption(paragraph.Range.Text, 0))
+                    //{
+                    //    if (TableCaptionCheck(style))
+                    //        paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлена подпись таблицы");
+                    //}
+                    //else
                     if (CurRazdel == Structure["список использованных источников"])
                     {
                         if (listMarker != "")
@@ -565,18 +570,18 @@ namespace vibe_check
                         }
                     }
                     else
-                    if (Regularochki.IsImageCaption(paragraph.Range.Text, 0))
-                    {
-                        if (TableCaptionCheck(style))
-                            paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлено наименование рисунка");
-                    }
-                    else
-                    if (Regularochki.IsTableCaption(paragraph.Range.Text, 0))
-                    {
-                        if (TableCaptionCheck(style))
-                            paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлено наименование таблицы");
-                    }
-                    else
+                    //if (Regularochki.IsImageCaption(paragraph.Range.Text, 0))
+                    //{
+                    //    if (TableCaptionCheck(style))
+                    //        paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлено наименование рисунка");
+                    //}
+                    //else
+                    //if (Regularochki.IsTableCaption(paragraph.Range.Text, 0))
+                    //{
+                    //    if (TableCaptionCheck(style))
+                    //        paragraph.Range.Comments.Add(paragraph.Range, "Неверно оформлено наименование таблицы");
+                    //}
+                    //else
                     if (CurRazdel == Structure["содержание"])
                     {
                         if (CommonCheck(style))
@@ -603,7 +608,7 @@ namespace vibe_check
                 doc.Paragraphs[1].Range.Comments.Add(doc.Paragraphs[1].Range, "Не найдено имя автора отчета на титульном листе");
 
             if (CurRazdel == 0)
-                doc.Paragraphs[1].Range.Comments.Add(doc.Paragraphs[1].Range, "Не найден ни один из обязательных разделов");
+                doc.Paragraphs[1].Range.Comments.Add(doc.Paragraphs[1].Range, "Не найден ни один из разделов документа");
             
             if (usedSourcesCount > refs.Count)
                 doc.Paragraphs[1].Range.Comments.Add(doc.Paragraphs[1].Range, "Отсутствуют все или некоторые ссылки на использованные источники");
@@ -638,7 +643,7 @@ namespace vibe_check
                 return false;
             }
 
-            string fio = Regularochki.FIO(fileName);
+            string fio = VerifRegex.FIO(fileName);
 
             string comment = "";
 
@@ -656,7 +661,7 @@ namespace vibe_check
                 if (comment != "")
                     paragraph.Range.Comments.Add(paragraph.Range, comment);
 
-                if (Regularochki.PageBreak(paragraph.Range.Text))
+                if (VerifRegex.PageBreak(paragraph.Range.Text))
                     continue;
 
                 if (PageNumber(paragraph.Range) < 2)
@@ -665,7 +670,7 @@ namespace vibe_check
 
                 if (paragraph.Range.Tables.Count == 0)
                 {
-                    if (Regularochki.EmptyString(paragraph.Range.Text))
+                    if (VerifRegex.EmptyString(paragraph.Range.Text))
                     {
                         paragraph.Range.Comments.Add(paragraph.Range, "Пустая строка");
                         continue;
@@ -714,7 +719,7 @@ namespace vibe_check
                 return false;
             }
 
-            string fio = Regularochki.FIO(fileName);
+            string fio = VerifRegex.FIO(fileName);
 
             string comment = "";
 
@@ -725,7 +730,7 @@ namespace vibe_check
                 if (comment != "")
                     paragraph.Range.Comments.Add(paragraph.Range, comment);
 
-                if (Regularochki.PageBreak(paragraph.Range.Text))
+                if (VerifRegex.PageBreak(paragraph.Range.Text))
                     continue;
 
                 if (PageNumber(paragraph.Range) < 2)
@@ -734,7 +739,7 @@ namespace vibe_check
 
                 if (paragraph.Range.Tables.Count == 0)
                 {
-                    if (Regularochki.EmptyString(paragraph.Range.Text))
+                    if (VerifRegex.EmptyString(paragraph.Range.Text))
                     {
                         paragraph.Range.Comments.Add(paragraph.Range, "Пустая строка");
                         continue;
@@ -748,7 +753,7 @@ namespace vibe_check
                     //if (comment != "")
                     //    paragraph.Range.Comments.Add(paragraph.Range, comment);
 
-                    string header = Regularochki.DeleteExtraSpaces(paragraph.Range.Text.ToLower());
+                    string header = VerifRegex.DeleteExtraSpaces(paragraph.Range.Text.ToLower());
 
                     if (Structure.ContainsKey(header))
                     {

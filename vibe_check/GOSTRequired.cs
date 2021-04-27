@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace vibe_check
 {
-    public partial class GOSTRequired : Form
+    public partial class StructureWindow : Form
     {
         Dictionary<string, int> structure = new Dictionary<string, int>();
         HashSet<string> requiredParts = new HashSet<string>();
@@ -24,7 +24,7 @@ namespace vibe_check
 
         XmlSerializer xs = new XmlSerializer(typeof(Save1));
 
-        public GOSTRequired()
+        public StructureWindow()
         {
             InitializeComponent();
             InitializeDGV();
@@ -115,10 +115,10 @@ namespace vibe_check
                     break;
                 //structure.Add(((string)row.Cells[0].Value).ToLower(), ++i);
                 structure.Add(("Приложение " + attachmentNum).ToLower(), i + 1);
-                structure.Add(("Приложение " + attachmentNum + "\v" + Regularochki.DeleteExtraSpaces((string)row.Cells[0].Value)).ToLower(), ++i);
+                structure.Add(("Приложение " + attachmentNum + "\v" + VerifRegex.DeleteExtraSpaces((string)row.Cells[0].Value)).ToLower(), ++i);
                 requiredParts.Add(("Приложение " + attachmentNum).ToLower());
-                requiredParts.Add(("Приложение " + attachmentNum + "\v" + Regularochki.DeleteExtraSpaces((string)row.Cells[0].Value)).ToLower());
-                attachments.Add(("Приложение " + attachmentNum).ToLower(), Regularochki.DeleteExtraSpaces((string)row.Cells[0].Value).ToLower());
+                requiredParts.Add(("Приложение " + attachmentNum + "\v" + VerifRegex.DeleteExtraSpaces((string)row.Cells[0].Value)).ToLower());
+                attachments.Add(("Приложение " + attachmentNum).ToLower(), VerifRegex.DeleteExtraSpaces((string)row.Cells[0].Value).ToLower());
                 attachmentNum++;
             }
 

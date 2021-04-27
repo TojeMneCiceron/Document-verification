@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace vibe_check
 {
-    class Regularochki
+    class VerifRegex
     {
         private static readonly Regex sppoRegex = new Regex(@"^ЛР1.?,?( |_)Ч1.?,?( |_)[А-Я]([а-я]|-|'|[А-Я])+( |_)([А-Я].)?([А-Я].)?,?[ |_]?[А-Я]{3}-[0-9]{1,2}-[0-9]{1,2}.docx?$");
         private static readonly Regex labRegex = new Regex(@"^ЛР[1-9].?,?( |_)[А-Я]([а-я]|-|'|[А-Я])+( |_)([А-Я].)?([А-Я].)?,?[ |_]?[А-Я]{3}-[0-9]{1,2}-[0-9]{1,2}.docx?$");

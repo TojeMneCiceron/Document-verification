@@ -1,6 +1,6 @@
 ﻿namespace vibe_check
 {
-    partial class GOSTRequired
+    partial class StructureWindow
     {
         /// <summary>
         /// Required designer variable.
